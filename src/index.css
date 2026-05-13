@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+  @custom-variant dark (&:where(.dark, .dark *));
+
+  body {
+  background-color: #fefdfb;
+  color: black;
+}
+
+
+.dark body {
+  background-color: #090809;  
+  color: #1f2937;             
+}
