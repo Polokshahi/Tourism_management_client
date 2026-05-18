@@ -1,64 +1,109 @@
 import React from 'react';
+import { Link } from 'react-router';
 import {
-  FaFacebook,
-  FaSquareInstagram,
-  FaLinkedin,
-  FaYoutube
-} from 'react-icons/fa6';
+  FaFacebookF,
+  FaInstagram,
+  FaLinkedinIn,
+  FaYoutube,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaEnvelope
+} from 'react-icons/fa';
 
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white py-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+  const currentYear = new Date().getFullYear();
 
-          {/* About */}
-          <div>
-            <h3 className="text-xl font-semibold mb-3">Tourism Management</h3>
-            <p className="text-sm text-gray-300">
-              Explore your dream destinations with our expert travel services. Safe, secure, and unforgettable experiences.
+  return (
+    <footer className="bg-slate-950 text-slate-200 border-t border-slate-800">
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+          
+          {/* Brand Identity */}
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold tracking-tight text-white">
+              Tour<span className="text-sky-500 gap-0.5">24/7</span>
+            </h3>
+            <p className="text-sm leading-relaxed text-slate-400">
+              Transforming travel into unforgettable journeys through expert management and a customer-first approach. 
+              Your gateway to authentic global experiences.
             </p>
-            {/* Social icons */}
-            <div className="flex gap-4 mt-4 text-2xl">
-              <a href="https://www.facebook.com/TopanRoy41105/" target="_blank" rel="noopener noreferrer">
-                <FaFacebook color="blue" />
-              </a>
-              <a href="https://www.instagram.com/topan_roy41105/?igsh=dWdpYmUxcDNuZnhz#" target="_blank" rel="noopener noreferrer">
-                <FaSquareInstagram color="red" />
-              </a>
-              <a href="https://www.linkedin.com/in/topanroy/" target="_blank" rel="noopener noreferrer">
-                <FaLinkedin color="blue" />
-              </a>
-              <a href="https://www.youtube.com/@Topanroy-t5q" target="_blank" rel="noopener noreferrer">
-                <FaYoutube color="red" />
-              </a>
+            <div className="flex gap-4">
+              {[
+                { icon: <FaFacebookF />, link: "https://www.facebook.com/Nameispoloks.9/" },
+                { icon: <FaInstagram />, link: "https://www.instagram.com/nameispolok/" },
+                { icon: <FaLinkedinIn />, link: "https://www.linkedin.com/in/polok-shahi-44b9a91aa/"},
+
+              ].map((social, idx) => (
+                <a 
+                  key={idx}
+                  href={social.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-sky-600 transition-colors duration-300 text-white"
+                >
+                  {social.icon}
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-xl font-semibold mb-3">Quick Links</h3>
-            <ul className="space-y-2 text-gray-300">
-              <li><a href="/" className="hover:text-white">Home</a></li>
-              <li><a href="/all-trips" className="hover:text-white">all-trips</a></li>
-              <li><a href="/dashboard" className="hover:text-white">Dashboard</a></li>
-              <li><a href="/about" className="hover:text-white">About Us</a></li>
+          {/* Navigation Links */}
+          <div className="lg:ml-auto">
+            <h4 className="text-white font-bold mb-6 uppercase text-xs tracking-widest">Explore</h4>
+            <ul className="space-y-4 text-sm">
+              <li><Link to="/" className="hover:text-sky-400 transition-colors">Home</Link></li>
+              <li><Link to="/all-trips" className="hover:text-sky-400 transition-colors">All Destinations</Link></li>
+              <li><Link to="/about" className="hover:text-sky-400 transition-colors">Our Story</Link></li>
+              <li><Link to="/dashboard" className="hover:text-sky-400 transition-colors">Management Portal</Link></li>
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-xl font-semibold mb-3">Contact Us</h3>
-            <p className="text-gray-300 text-sm">Phone: +880 1706541105</p>
-            <p className="text-gray-300 text-sm">Email: roytopan734@gmail.com
-</p>
-            <p className="text-gray-300 text-sm">Location: Birgonj, Dinajpur</p>
+          {/* Office Information */}
+          <div className="lg:ml-auto">
+            <h4 className="text-white font-bold mb-6 uppercase text-xs tracking-widest">Connect</h4>
+            <ul className="space-y-4 text-sm">
+              <li className="flex items-start gap-3">
+                <FaMapMarkerAlt className="text-sky-500 mt-1" />
+                <span className="text-slate-400">Bogura Sadar, Bogura, <br />Bangladesh</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <FaPhoneAlt className="text-sky-500" />
+                <a href="tel:+8801718175422" className="hover:text-white">+8801718175422</a>
+              </li>
+              <li className="flex items-center gap-3">
+                <FaEnvelope className="text-sky-500" />
+                <a href="mailto:polokshahi2@gmail.com" className="hover:text-white">polokshahi2@gmail.com</a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Lead Gen / Newsletter */}
+          <div className="space-y-6">
+            <h4 className="text-white font-bold uppercase text-xs tracking-widest">Stay Updated</h4>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Subscribe to receive exclusive travel deals and agency updates.
+            </p>
+            <div className="flex">
+              <input 
+                type="email" 
+                placeholder="Email address"
+                className="bg-slate-900 border border-slate-700 text-white px-4 py-2 rounded-l-md w-full focus:outline-none focus:border-sky-500 text-sm"
+              />
+              <button className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-r-md transition-colors text-sm font-bold">
+                Join
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="text-center text-gray-400 text-sm mt-10 border-t pt-5 border-gray-700">
-          &copy; {new Date().getFullYear()} Tourism Management | Developed by Topan Roy
+        {/* Legal & Attribution */}
+        <div className="mt-20 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
+          <p>© {currentYear} Tour 24/7 Tourism Solutions. All rights reserved.</p>
+          <div className="flex gap-6">
+            <a href="#" className="hover:text-white">Privacy Policy</a>
+            <a href="#" className="hover:text-white">Terms of Service</a>
+          </div>
+          <p>Managed by <span className="text-slate-300">Md. Abdulla Hel Shahi</span></p>
         </div>
       </div>
     </footer>

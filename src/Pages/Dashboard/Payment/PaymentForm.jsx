@@ -6,31 +6,37 @@ import Swal from 'sweetalert2';
 import useAuth from '../../../hooks/useAuth';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 
-
 const PaymentForm = () => {
     const stripe = useStripe();
     const elements = useElements();
+
     const { bookingId } = useParams();
     const { user } = useAuth();
     const axiosSecure = useAxiosSecure();
     const navigate = useNavigate();
-    const [error, setError] = useState('');
 
+    const [error, setError] = useState('');
+    const [processing, setProcessing] = useState(false);
+
+    // Fetch booking
     const { isPending, data: bookingInfo = {} } = useQuery({
         queryKey: ['booking', bookingId],
         queryFn: async () => {
-           const res = await axiosSecure.get(`/bookings/${bookingId}`);
+            const res = await axiosSecure.get(`/bookings/${bookingId}`);
             return res.data;
         }
     });
 
     if (isPending) {
-        return <span className="loading loading-bars loading-lg"></span>;
+        return (
+            <div className="flex justify-center items-center h-40">
+                <span className="loading loading-bars loading-lg"></span>
+            </div>
+        );
     }
-    // console.log(bookingInfo)
 
-    const amount = bookingInfo.price;
-    const amountInCents = amount * 100;
+    const amount = bookingInfo?.price || 0;
+    const amountInCents = Math.round(amount * 100);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -40,82 +46,145 @@ const PaymentForm = () => {
         const card = elements.getElement(CardElement);
         if (!card) return;
 
-        const { error, paymentMethod } = await stripe.createPaymentMethod({
-            type: 'card',
-            card: card,
-        });
+        setProcessing(true);
+        setError('');
 
-        if (error) {
-            console.error(error);
-            setError(error.message);
-        } else {
-            console.log('PaymentMethod created:', paymentMethod);
-            setError('');
-        }
-        if (error) {
-            setError(error.message);
-        } else {
-            setError('');
+        try {
+            // 1. Create Payment Method
+            const { error: stripeError } = await stripe.createPaymentMethod({
+                type: 'card',
+                card,
+            });
 
-            // Step 2: Create Payment Intent
+            if (stripeError) {
+                setError(stripeError.message);
+                setProcessing(false);
+                return;
+            }
+
+            // 2. Create Payment Intent
             const res = await axiosSecure.post('/create-payment-intent', {
                 amountInCents,
-                bookingId
+                bookingId,
             });
 
             const clientSecret = res.data.clientSecret;
 
-            // Step 3: Confirm Payment
+            // 3. Confirm Payment
             const result = await stripe.confirmCardPayment(clientSecret, {
                 payment_method: {
                     card,
                     billing_details: {
-                        name: user.displayName,
-                        email: user.email
-                    }
-                }
+                        name: user?.displayName,
+                        email: user?.email,
+                    },
+                },
             });
 
             if (result.error) {
                 setError(result.error.message);
-            } else {
-                if (result.paymentIntent.status === 'succeeded') {
-                    const transactionId = result.paymentIntent.id;
+                setProcessing(false);
+                return;
+            }
 
-                    // Step 4: Save Payment History + Mark Booking as Paid
-                    const paymentData = {
-                        bookingId,
-                        email: user.email,
-                        amount,
-                        transactionId,
-                        paymentMethod: result.paymentIntent.payment_method_types
-                    };
+            // 4. Success
+            if (result.paymentIntent.status === 'succeeded') {
+                const transactionId = result.paymentIntent.id;
 
-                   const paymentRes = await axiosSecure.post('/payments', paymentData);
-                    if (paymentRes.data.insertedId) {
-                        await Swal.fire({
-                            icon: 'success',
-                            title: 'Payment Successful!',
-                            html: `<strong>Transaction ID:</strong> <code>${transactionId}</code>`,
-                            confirmButtonText: 'Go to My Bookings'
-                        });
+                const paymentData = {
+                    bookingId,
+                    email: user.email,
+                    amount,
+                    transactionId,
+                    paymentMethod: 'card',
+                };
 
-                        navigate('/dashboard/my-bookings');
-                    }
+                const paymentRes = await axiosSecure.post('/payments', paymentData);
+
+                if (paymentRes.data.insertedId) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Successful!',
+                        html: `<strong>Transaction ID:</strong><br/><code>${transactionId}</code>`,
+                        confirmButtonText: 'Go to My Bookings',
+                    });
+
+                    navigate('/dashboard/my-bookings');
                 }
             }
+
+        } catch (err) {
+            setError('Something went wrong!');
+            console.error(err);
         }
+
+        setProcessing(false);
     };
 
+    // Stripe not ready guard
+    if (!stripe || !elements) {
+        return (
+            <div className="flex justify-center items-center h-40">
+                <span className="loading loading-bars loading-lg"></span>
+            </div>
+        );
+    }
+
     return (
-        <div>
-            <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-xl shadow-md w-full max-w-md mx-auto">
-                <CardElement className="p-2 border rounded" />
-                <button type="submit" className="btn btn-primary text-black w-full" disabled={!stripe}>
-                    Pay ${amount}
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+
+            <form
+                onSubmit={handleSubmit}
+                className="space-y-5 bg-white p-6 rounded-xl shadow-md w-full max-w-md"
+            >
+
+                <h2 className="text-xl font-semibold text-center">
+                    Complete Payment
+                </h2>
+
+                {/* Amount */}
+                <p className="text-center text-gray-600">
+                    Pay <span className="font-bold">${amount}</span>
+                </p>
+
+                {/* Stripe Card */}
+                <div className="p-3 border rounded bg-white">
+                    <CardElement
+                        options={{
+                            style: {
+                                base: {
+                                    fontSize: '16px',
+                                    color: '#111',
+                                    '::placeholder': {
+                                        color: '#aaa',
+                                    },
+                                },
+                                invalid: {
+                                    color: '#fa755a',
+                                },
+                            },
+                        }}
+                    />
+                </div>
+
+                {/* Error */}
+                {error && (
+                    <p className="text-red-500 text-sm">
+                        {error}
+                    </p>
+                )}
+
+                {/* Button */}
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="btn btn-primary w-full text-black"
+                >
+                    {processing ? 'Processing...' : `Pay $${amount}`}
                 </button>
-                {error && <p className="text-red-500">{error}</p>}
+
             </form>
+
         </div>
     );
 };

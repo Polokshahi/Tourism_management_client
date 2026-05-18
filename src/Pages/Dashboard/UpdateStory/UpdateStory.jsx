@@ -73,7 +73,7 @@ const UpdateStory = () => {
         />
         <textarea
           name="text"
-          defaultValue={story.text}
+          defaultValue={story.description}
           className="textarea textarea-bordered w-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
           rows={5}
           placeholder="Story Text"
@@ -88,7 +88,7 @@ const UpdateStory = () => {
               <button
                 type="button"
                 onClick={() => handleRemoveImage(img)}
-                className="absolute top-1 right-1 bg-red-600 text-white rounded-full px-2 text-xs"
+                className="absolute top-1 right-1 bg-red-600 text-white rounded-full px-2 text-xs cursor-pointer"
               >
                 ✕
               </button>
@@ -113,7 +113,7 @@ const UpdateStory = () => {
           </div>
         )}
 
-        <button type="submit" className="px-2 py-1 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
+        <button type="submit" className="px-2 py-1 rounded-lg  bg-blue-600 text-white font-semibold hover:bg-blue-700 transition cursor-pointer">
           Update Story
         </button>
       </form>

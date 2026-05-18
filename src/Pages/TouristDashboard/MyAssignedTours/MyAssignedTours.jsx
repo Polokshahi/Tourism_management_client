@@ -13,7 +13,10 @@ const MyAssignedTours = () => {
     if (user?.email) {
       axiosSecure
         .get(`/bookings/assigned?email=${user.email}`)
-        .then((res) => setAssignedTours(res.data))
+        .then((res) => {
+          setAssignedTours(res.data);
+          console.log(res.data);
+        })
         .catch((err) => console.error(err));
     }
   }, [user?.email, axiosSecure]);

@@ -20,7 +20,7 @@ const TourNest = () => {
           <p className="text-2xl font-black tracking-tighter text-[#443dff] dark:text-white uppercase">
             Tour <span className="text-yellow-400">24/7</span>
           </p>
-          <span className="text-[10px] font-bold tracking-[0.2em] text-gray-500 dark:text-gray-400 uppercase">
+          <span className="text-[10px] font-bold tracking-[0.2em] text-white dark:text-gray-400 uppercase">
             Explore the world
           </span>
         </div>

@@ -16,31 +16,45 @@ const OurPackages = () => {
   }, []);
 
   return (
-    <div className="mt-6 grid md:grid-cols-3 gap-6">
+    <div className="mt-8 grid md:grid-cols-3 gap-6">
       {packages.map((pkg) => (
         <div
           key={pkg._id}
-          className="bg-white shadow-lg rounded-2xl overflow-hidden hover:shadow-2xl transition"
+          className="group rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300
+          bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800"
         >
-          <img
-            src={pkg.images}
-            alt={pkg.title}
-            className="w-full h-48 object-cover"
-          />
-          <div className="p-4 space-y-2">
-            <h3 className="text-xl text-black font-semibold">{pkg.title}</h3>
-            <p className="text-sm text-gray-600">Location: {pkg.location}</p>
-            <p className="text-green-600 font-bold">Price: {pkg.price}</p>
-            <div className="flex justify-between">
+          <div className="overflow-hidden">
+            <img
+              src={pkg.images}
+              alt={pkg.title}
+              className="w-full h-48 object-cover group-hover:scale-105 transition duration-500"
+            />
+          </div>
+
+          <div className="p-5 space-y-3">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+              {pkg.title}
+            </h3>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Location: {pkg.location}
+            </p>
+
+            <p className="text-indigo-600 dark:text-indigo-400 font-bold">
+              ${pkg.price}
+            </p>
+
+            <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setSelectedPackage(pkg)}
-                className="px-4 py-1 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                className="flex-1 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition"
               >
-                View Details
+                View
               </button>
-              <NavLink to={`/packages/${pkg._id}`}>
-                <button className="px-4 py-1 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold hover:bg-blue-600 hover:text-white transition">
-                  Package Details
+
+              <NavLink to={`/packages/${pkg._id}`} className="flex-1">
+                <button className="w-full px-3 py-2 rounded-xl border border-indigo-500 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white text-sm font-medium transition">
+                  Details
                 </button>
               </NavLink>
             </div>
@@ -48,40 +62,55 @@ const OurPackages = () => {
         </div>
       ))}
 
-      {/* Modal */}
+      {/* MODAL */}
       {selectedPackage && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-[90%] max-w-lg relative">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl
+          bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
+
+            {/* Close */}
             <button
               onClick={() => setSelectedPackage(null)}
-              className="absolute top-2 right-2 text-red-500 text-xl"
+              className="absolute right-4 top-4 text-red-500 hover:text-red-600 text-lg"
             >
               <FaTimes />
             </button>
+
             <img
               src={selectedPackage.images}
-              alt={selectedPackage.title}
-              className="w-full h-48 object-cover rounded-md mb-4"
+              className="w-full h-52 object-cover"
+              alt=""
             />
-            <h2 className="text-2xl text-black font-bold mb-2">
-              {selectedPackage.title}
-            </h2>
-            <p className="text-gray-700 mb-1">
-              <strong>Location:</strong> {selectedPackage.location}
-            </p>
-            <p className="text-gray-700 mb-1">
-              <strong>Duration:</strong> {selectedPackage.duration}
-            </p>
-            <p className="text-gray-700 mb-1">
-              <strong>Price:</strong> ${selectedPackage.price}
-            </p>
-            <p className="text-gray-600 mt-3">{selectedPackage.description}</p>
+
+            <div className="p-6 space-y-3">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {selectedPackage.title}
+              </h2>
+
+              <p className="text-gray-500 dark:text-gray-400">
+                <b>Location:</b> {selectedPackage.location}
+              </p>
+
+              <p className="text-gray-500 dark:text-gray-400">
+                <b>Duration:</b> {selectedPackage.duration}
+              </p>
+
+              <p className="text-indigo-600 dark:text-indigo-400 font-bold">
+                ${selectedPackage.price}
+              </p>
+
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-6">
+                {selectedPackage.description}
+              </p>
+            </div>
           </div>
         </div>
       )}
     </div>
   );
 };
+
+/* ---------------- GUIDES ---------------- */
 
 const MeetOurTourGuides = () => {
   const axiosSecure = useAxios();
@@ -95,21 +124,29 @@ const MeetOurTourGuides = () => {
   }, []);
 
   return (
-    <div className="mt-6 grid md:grid-cols-3 gap-6">
+    <div className="mt-8 grid md:grid-cols-3 gap-6">
       {guides.map((guide) => (
         <div
           key={guide._id}
-          className="bg-white shadow-lg rounded-2xl p-4 flex flex-col items-center"
+          className="text-center p-6 rounded-2xl shadow-md hover:shadow-xl transition
+          bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800"
         >
           <img
             src={guide.image}
             alt={guide.name}
-            className="w-32 h-32 rounded-full object-cover mb-4"
+            className="w-28 h-28 mx-auto rounded-full object-cover border-4 border-indigo-500"
           />
-          <h3 className="text-xl text-black font-semibold">{guide.name}</h3>
-          <p className="text-gray-600">{guide.reason} </p>
-          <NavLink to='/dashboard/manageprofile'>
-            <button className="mt-3 bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded">
+
+          <h3 className="mt-4 text-lg font-bold text-gray-900 dark:text-white">
+            {guide.name}
+          </h3>
+
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {guide.reason}
+          </p>
+
+          <NavLink to="/dashboard/manageprofile">
+            <button className="mt-4 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition">
               View Profile
             </button>
           </NavLink>
@@ -119,35 +156,32 @@ const MeetOurTourGuides = () => {
   );
 };
 
+/* ---------------- TABS ---------------- */
+
 const TabsComponent = () => {
   const [activeTab, setActiveTab] = useState("packages");
 
   return (
-    <div className="max-w-7xl mx-auto px-4 my-10">
-      <h2 className="text-3xl font-bold text-center mb-6 text-indigo-700">
-        Tourism and Travel Guide
+    <div className="max-w-7xl mx-auto px-4 my-12">
+      <h2 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">
+        Tourism & Travel Guide
       </h2>
 
       {/* Tabs */}
-      <div className="flex justify-center space-x-6 border-b-2 border-gray-300">
-        <button
-          onClick={() => setActiveTab("packages")}
-          className={`pb-3 font-semibold ${activeTab === "packages"
-            ? "border-b-4 border-indigo-600 text-indigo-600"
-            : "text-gray-600 hover:text-indigo-600"
+      <div className="flex justify-center gap-8 border-b border-gray-300 dark:border-slate-700">
+        {["packages", "guides"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`pb-3 font-semibold transition ${
+              activeTab === tab
+                ? "border-b-4 border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                : "text-gray-500 dark:text-gray-400 hover:text-indigo-500"
             }`}
-        >
-          Our Packages
-        </button>
-        <button
-          onClick={() => setActiveTab("guides")}
-          className={`pb-3 font-semibold ${activeTab === "guides"
-            ? "border-b-4 border-indigo-600 text-indigo-600"
-            : "text-gray-600 hover:text-indigo-600"
-            }`}
-        >
-          Meet Our Tour Guides
-        </button>
+          >
+            {tab === "packages" ? "Our Packages" : "Tour Guides"}
+          </button>
+        ))}
       </div>
 
       {/* Content */}

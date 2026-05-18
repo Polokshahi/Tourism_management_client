@@ -1,42 +1,62 @@
-import axios from 'axios';
-import { useNavigate } from 'react-router'; 
-import useAuth from './useAuth';
+import axios from "axios";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
+import useAuth from "./useAuth";
 
 const axiosSecure = axios.create({
-    baseURL: 'http://localhost:5000/',
+  baseURL: "http://localhost:5000",
 });
+
+let isInterceptorSet = false;
 
 const useAxiosSecure = () => {
   const { user, logOut } = useAuth();
   const navigate = useNavigate();
 
-  // 🔐 Request interceptor for attaching token
-  axiosSecure.interceptors.request.use(
-    async (config) => {
-      if (user) {
-        const token = await user.getIdToken();
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    },
-    (error) => Promise.reject(error)
-  );
+  useEffect(() => {
+    if (isInterceptorSet) return;
 
-  // ❌ Response error interceptor
-  axiosSecure.interceptors.response.use(
-    (res) => res,
-    (error) => {
-      const status = error.response?.status;
-      if (status === 403) {
-        navigate('/forbidden');
-      } else if (status === 401) {
-        logOut()
-          .then(() => navigate('/login'))
-          .catch(() => {});
+    // 🔐 REQUEST INTERCEPTOR (Attach Firebase token)
+    const requestInterceptor = axiosSecure.interceptors.request.use(
+      async (config) => {
+        if (user) {
+          const token = await user.getIdToken();
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    // ❌ RESPONSE INTERCEPTOR (Handle auth errors)
+    const responseInterceptor = axiosSecure.interceptors.response.use(
+      (res) => res,
+      (error) => {
+        const status = error.response?.status;
+
+        if (status === 401) {
+          logOut()
+            .then(() => navigate("/login"))
+            .catch(() => {});
+        }
+
+        if (status === 403) {
+          navigate("/forbidden");
+        }
+
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
-    }
-  );
+    );
+
+    isInterceptorSet = true;
+
+    // cleanup (important for dev mode React StrictMode)
+    return () => {
+      axiosSecure.interceptors.request.eject(requestInterceptor);
+      axiosSecure.interceptors.response.eject(responseInterceptor);
+      isInterceptorSet = false;
+    };
+  }, [user, logOut, navigate]);
 
   return axiosSecure;
 };
