@@ -16,7 +16,7 @@ const useAxiosSecure = () => {
   useEffect(() => {
     if (isInterceptorSet) return;
 
-    // 🔐 REQUEST INTERCEPTOR (Attach Firebase token)
+    // REQUEST INTERCEPTOR
     const requestInterceptor = axiosSecure.interceptors.request.use(
       async (config) => {
         if (user) {
@@ -28,16 +28,14 @@ const useAxiosSecure = () => {
       (error) => Promise.reject(error)
     );
 
-    // ❌ RESPONSE INTERCEPTOR (Handle auth errors)
+    // RESPONSE INTERCEPTOR
     const responseInterceptor = axiosSecure.interceptors.response.use(
       (res) => res,
       (error) => {
         const status = error.response?.status;
 
         if (status === 401) {
-          logOut()
-            .then(() => navigate("/login"))
-            .catch(() => {});
+          logOut().then(() => navigate("/login"));
         }
 
         if (status === 403) {
@@ -50,7 +48,6 @@ const useAxiosSecure = () => {
 
     isInterceptorSet = true;
 
-    // cleanup (important for dev mode React StrictMode)
     return () => {
       axiosSecure.interceptors.request.eject(requestInterceptor);
       axiosSecure.interceptors.response.eject(responseInterceptor);
